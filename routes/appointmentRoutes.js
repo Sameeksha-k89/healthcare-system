@@ -2,41 +2,77 @@ const express = require("express");
 const router = express.Router();
 
 const Appointment = require("../models/Appointment");
+const Doctor = require("../models/Doctor"); // ✅ needed for availability check
 const auth = require("../middleware/authMiddleware");
 
 
+// ---------------------------
 // GET ALL APPOINTMENTS
+// ---------------------------
 router.get("/", auth, async (req, res) => {
-   try {
-
-      const data = await Appointment.find();
-
-      res.json(data);
-
-   } catch (err) {
-      res.status(500).json({ message: err.message });
-   }
+  try {
+    const data = await Appointment.find();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 
-// CREATE APPOINTMENT
+// ---------------------------
+// CREATE APPOINTMENT (WITH CHECKS)
+// ---------------------------
 router.post("/", auth, async (req, res) => {
-   try {
+  try {
 
-      const appointment = await Appointment.create({
-         patient: req.user.name,
-         doctor: req.body.doctor,
-         date: req.body.date,
-         time: req.body.time
-      });
+    // ❗ 1. Doctor exists check
+    const doctor = await Doctor.findOne({ name: req.body.doctor });
 
-      res.status(201).json(appointment);
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found" });
+    }
 
-   } catch (err) {
-      res.status(500).json({ message: err.message });
-   }
+    // ❗ 2. Availability check
+    const isAvailable = doctor.availability?.some(
+      slot => slot.day === req.body.day
+    );
+
+    if (!isAvailable) {
+      return res.status(400).json({ message: "Doctor not available on this day" });
+    }
+
+    // ❗ 3. Slot conflict check
+    const existingAppointment = await Appointment.findOne({
+      doctor: req.body.doctor,
+      date: req.body.date,
+      time: req.body.time
+    });
+
+    if (existingAppointment) {
+      return res.status(400).json({ message: "Slot already booked" });
+    }
+
+    // ❗ 4. Create appointment
+    const appointment = await Appointment.create({
+      patient: req.user.name,
+      doctor: req.body.doctor,
+      date: req.body.date,
+      time: req.body.time,
+      status: "scheduled"
+    });
+
+    res.status(201).json(appointment);
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
-router.put("/:id", async (req, res) => {
+
+
+// ---------------------------
+// UPDATE APPOINTMENT
+// ---------------------------
+router.put("/:id", auth, async (req, res) => {
   try {
     const updated = await Appointment.findByIdAndUpdate(
       req.params.id,
@@ -44,12 +80,22 @@ router.put("/:id", async (req, res) => {
       { new: true }
     );
 
+    if (!updated) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
     res.json(updated);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-router.delete("/:id", async (req, res) => {
+
+
+// ---------------------------
+// DELETE APPOINTMENT
+// ---------------------------
+router.delete("/:id", auth, async (req, res) => {
   try {
     const deleted = await Appointment.findByIdAndDelete(req.params.id);
 
@@ -58,8 +104,33 @@ router.delete("/:id", async (req, res) => {
     }
 
     res.json({ message: "Appointment deleted successfully" });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+// ---------------------------
+// UPDATE STATUS
+// ---------------------------
+router.put("/status/:id", auth, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    appointment.status = req.body.status;
+
+    await appointment.save();
+
+    res.json(appointment);
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

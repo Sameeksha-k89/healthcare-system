@@ -1,113 +1,190 @@
 # 🏥 Digital Healthcare Records & Appointment System
 
-## 📌 Overview
-A backend healthcare management system built using Node.js, Express.js, MongoDB, and JWT authentication.
-
-It provides secure authentication, role-based access control, and management of electronic medical records, appointments, and prescriptions.
+A secure backend system built using Node.js, Express.js, MongoDB, and JWT authentication for managing healthcare operations like patients, doctors, appointments, EMR, prescriptions, and admin control.
 
 ---
 
-## ⚙️ Technologies Used
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT (JSON Web Token)
-- bcrypt.js
-- Postman
+## 📌 Project Overview
+
+This project provides a secure backend API system for healthcare management with role-based access control for:
+- Patients
+- Doctors
+- Admins
+
+It solves problems like appointment conflicts, insecure medical data, and poor record management.
 
 ---
 
 ## 🚀 Features
-- User Registration & Login
-- JWT Authentication
-- Role-Based Access Control (Admin / Doctor / Patient)
-- Electronic Medical Records (EMR)
-- Appointment Booking System
-- Prescription Management System
-- RESTful API Design
+
+### 🔐 Authentication
+- Register / Login users
+- JWT authentication
+- Password hashing using bcrypt
+- Role-based access (patient, doctor, admin)
 
 ---
 
-## 📥 Installation
+### 👤 User Management (Admin)
+- View all users
+- Block / Unblock users
+- Admin-only access control
 
-### 1. Clone the Repository
-git clone https://github.com/YOUR_USERNAME/healthcare-system.git
+---
 
-### 2. Navigate to Project Folder
-cd healthcare-system
+### 🏥 EMR System
+- Create medical records
+- View records based on role
+- Update records with audit logs (who, what, when)
+- Delete records
 
-### 3. Install Dependencies
+---
+
+### 📅 Appointment System
+- Book appointments
+- Prevent double booking
+- Doctor availability check
+- Status updates:
+  - scheduled
+  - completed
+  - cancelled
+  - no-show
+
+---
+
+### 💊 Prescription System
+- Create prescriptions
+- View prescriptions (role-based)
+- Update / Delete prescriptions
+
+---
+
+### 👨‍⚕️ Doctor Module
+- Doctor profiles
+- Availability tracking
+- Patient assignment support
+
+---
+
+### 📊 Admin Reports
+- Total users
+- Patients & doctors count
+- Appointment statistics
+- System overview
+
+---
+
+## 🛠 Tech Stack
+
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
+- JWT
+- bcryptjs
+- Postman
+
+---
+
+## 📁 Project Structure
+
+/models  
+/routes  
+/middleware  
+server.js  
+.env  
+
+---
+
+## ⚙️ Setup
+
+### Install dependencies
 npm install
 
-### 4. Create .env File
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-
-### 5. Run Server
+### Run server
 npm run dev
 
 ---
 
-## 🔐 Authentication
+## 🔗 API Routes
 
-### Register User
-POST /api/auth/register
+### Auth
+POST /api/auth/register  
+POST /api/auth/login  
 
-### Login User
-POST /api/auth/login
+### Admin
+GET /api/admin/users  
+PUT /api/admin/block/:id  
+PUT /api/admin/unblock/:id  
+GET /api/admin/reports  
 
-### JWT Token Usage
-After login, use the token in headers for protected routes:
+### EMR
+POST /api/emr  
+GET /api/emr  
+PUT /api/emr/:id  
+DELETE /api/emr/:id  
+
+### Appointments
+POST /api/appointments  
+GET /api/appointments  
+PUT /api/appointments/:id  
+PUT /api/appointments/status/:id  
+DELETE /api/appointments/:id  
+
+### Prescriptions
+POST /api/prescriptions  
+GET /api/prescriptions  
+PUT /api/prescriptions/:id  
+DELETE /api/prescriptions/:id  
+
+---
+
+## 🔐 Authentication Flow
+
+1. Register
+2. Login
+3. Get JWT token
+4. Use token in headers:
 
 Authorization: Bearer <token>
 
 ---
 
-## 🏥 EMR (Electronic Medical Records)
+## 🧠 Key Features
 
-POST /api/emr
-GET /api/emr
-
----
-
-## 📅 Appointments
-
-POST /api/appointments
-GET /api/appointments
-PUT /api/appointments/:id
-DELETE /api/appointments/:id
+- Secure authentication
+- Role-based authorization
+- Appointment conflict prevention
+- Doctor availability validation
+- EMR audit logging
+- Admin reporting system
 
 ---
 
-## 💊 Prescriptions
+## 📊 Sample Admin Report
 
-POST /api/prescriptions
-GET /api/prescriptions
-PUT /api/prescriptions/:id
-DELETE /api/prescriptions/:id
-
----
-
-## 🔒 Role-Based Access Control
-
-- Admin → Full access to all modules
-- Doctor → Manage appointments and prescriptions
-- Patient → Book appointments and view own records
-
----
-
-## 🧪 Testing Steps (Postman Flow)
-
-1. Register user → /api/auth/register
-2. Login user → /api/auth/login
-3. Copy JWT token
-4. Add token to headers:
-   Authorization: Bearer <token>
-5. Test all protected routes
+{
+  "users": {
+    "total": 10,
+    "patients": 6,
+    "doctors": 3
+  },
+  "appointments": {
+    "total": 20,
+    "scheduled": 10,
+    "completed": 5,
+    "cancelled": 3,
+    "noShow": 2
+  }
+}
 
 ---
 
-## 👨‍💻 Author
-Sameeksha
+## 👩‍💻 Author
+
+Sameeksha K and Vaishnavi Kini
+
+---
+
+## 🏁 Status
+
+Project completed and ready for submission

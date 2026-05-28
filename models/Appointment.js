@@ -1,13 +1,26 @@
 const mongoose = require("mongoose");
 
 const appointmentSchema = new mongoose.Schema({
-   patient:String,
-   doctor:String,
-   date:String,
-   time:String,
-   status:{
-      type:String,
-      default:"scheduled"
+   patient: {
+      type: String,
+      required: true
+   },
+   doctor: {
+      type: String,
+      required: true
+   },
+   date: {
+      type: String,
+      required: true
+   },
+   time: {
+      type: String,
+      required: true
+   },
+   status: {
+      type: String,
+      enum: ["scheduled", "completed", "cancelled", "no-show"],
+      default: "scheduled"
    }
 });
 

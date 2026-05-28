@@ -21,6 +21,12 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/emr", require("./routes/emrRoutes"));
 app.use("/api/appointments",require("./routes/appointmentRoutes"));
 app.use("/api/prescriptions", require("./routes/prescriptionRoutes"));
+const doctorRoutes = require("./routes/doctorRoutes");
+
+app.use("/api/doctors", doctorRoutes);
+const adminRoutes = require("./routes/adminRoutes");
+
+app.use("/api/admin", adminRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, ()=>{
